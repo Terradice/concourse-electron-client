@@ -3,6 +3,7 @@ const dns = require('dns');
 
 
 let $chatWindow = $('#messages');
+let me = "";
 const dialogs = (require('dialogs'))()
 dialogs.prompt("auth server address: ", "", (a) => {
     dialogs.prompt("chat server address: ", "", (b) => {
@@ -18,8 +19,12 @@ dialogs.prompt("auth server address: ", "", (a) => {
 
             function printMessage(fromUser, message) {
                 var $user = $('<span class="username">').text(fromUser + ':');
-                if (fromUser === c) {
+                if (fromUser === me) {
                   $user.addClass('me');
+                } else {
+                    var notify = new Notification(fromUser, {
+                        body: message
+                    });
                 }
                 var $message = $('<span class="message">').text(message);
                 var $container = $('<div class="message-container">');
@@ -38,6 +43,7 @@ dialogs.prompt("auth server address: ", "", (a) => {
             auth.on('data', (data) => {
                 try {
                     data = JSON.parse(data.toString().trim());
+                    me = data.id;
                     chat.write(JSON.stringify({intent: "claim", data: data.id}));   
                 } catch (error) {
                     throw error
@@ -49,11 +55,6 @@ dialogs.prompt("auth server address: ", "", (a) => {
                 try {
                     data = JSON.parse(data.toString().trim()).data;
                     printMessage(data.from, data.content);
-                    var notify = new Notification('Hi there!', {
-                        body: 'How are you doing?',
-                        icon: 'https://bit.ly/2DYqRrh',
-                    });
-                    
                 } catch (error) {
                     throw error;  
                 }
