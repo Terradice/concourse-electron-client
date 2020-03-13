@@ -18,7 +18,7 @@ dialogs.prompt("auth server address: ", "", (a) => {
 
             function printMessage(fromUser, message) {
                 var $user = $('<span class="username">').text(fromUser + ':');
-                if (fromUser === "terradice") {
+                if (fromUser === c) {
                   $user.addClass('me');
                 }
                 var $message = $('<span class="message">').text(message);
