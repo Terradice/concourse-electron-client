@@ -27,14 +27,13 @@ dialogs.prompt("auth server address: ", "", (a) => {
                 })
 
                 let mentions  = message.match(/<@(.*)>/gi);
-                if(mentions) {
+                const get_nick = (n) => {return nicks[n] ? nicks[n] : n; }
+                
+                if(mentions) {                    
                     mentions.forEach((m) => {
-                        if(nicks[m.slice(2, -1)] ) {
-                            message = message.replace(m, `@${nicks[m.slice(2, -1)]}`);
-                        };
-
-                        if(m.slice(2, -1) == me && fromUser !== me) {
-                            var notify = new Notification(fromUser, {
+                        message = message.replace(m, `<span class="mention">@${get_nick(m.slice(2, -1))}</span>`);
+                        if(get_nick(m) == me && fromUser !== me) {
+                            var notify = new Notification(get_nick(m), {
                                 body: message
                             });
                         }
@@ -47,7 +46,7 @@ dialogs.prompt("auth server address: ", "", (a) => {
                     $user.addClass('server');
                 }
 
-                var $message = $('<span class="message">').text(message);
+                var $message = $('<span class="message">').append(message);
                 var $container = $('<div class="message-container">');
                 $container.append($user).append($message);
                 $chatWindow.append($container);

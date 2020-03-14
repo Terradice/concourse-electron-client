@@ -66,6 +66,10 @@
     margin:5px 0;
     padding:0;
   }
+
+  .message-container .mention {
+    color: #5f5fff;
+  }
   
   .info {
     margin:5px 0;
