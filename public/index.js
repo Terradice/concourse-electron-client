@@ -4,6 +4,7 @@ const dns = require('dns');
 
 let $chatWindow = $('#messages');
 let me = "";
+let nicks = {};
 const dialogs = (require('dialogs'))()
 dialogs.prompt("auth server address: ", "", (a) => {
     dialogs.prompt("chat server address: ", "", (b) => {
@@ -18,14 +19,34 @@ dialogs.prompt("auth server address: ", "", (a) => {
             });
 
             function printMessage(fromUser, message) {
-                var $user = $('<span class="username">').text(fromUser + ':');
-                if (fromUser === me) {
-                  $user.addClass('me');
-                } else {
-                    var notify = new Notification(fromUser, {
-                        body: message
+                var $user = $('<a class="username">').text(`[${nicks[fromUser] ? nicks[fromUser] : fromUser}]`);
+                $user.on('contextmenu', () => {
+                    dialogs.prompt(`Set nickname for ${fromUser}`, "", (nick) => {
+                        nicks[fromUser] = nick;
+                    });
+                })
+
+                let mentions  = message.match(/<@(.*)>/gi);
+                if(mentions) {
+                    mentions.forEach((m) => {
+                        if(nicks[m.slice(2, -1)] ) {
+                            message = message.replace(m, `@${nicks[m.slice(2, -1)]}`);
+                        };
+
+                        if(m.slice(2, -1) == me && fromUser !== me) {
+                            var notify = new Notification(fromUser, {
+                                body: message
+                            });
+                        }
                     });
                 }
+
+                if (fromUser === me) {
+                    $user.addClass('me');
+                } else if(fromUser === "server") {
+                    $user.addClass('server');
+                }
+
                 var $message = $('<span class="message">').text(message);
                 var $container = $('<div class="message-container">');
                 $container.append($user).append($message);
@@ -44,6 +65,7 @@ dialogs.prompt("auth server address: ", "", (a) => {
                 try {
                     data = JSON.parse(data.toString().trim());
                     me = data.id;
+                    nicks[me] = c;
                     chat.write(JSON.stringify({intent: "claim", data: data.id}));   
                 } catch (error) {
                     throw error
@@ -54,7 +76,11 @@ dialogs.prompt("auth server address: ", "", (a) => {
             chat.on('data', (data) => {
                 try {
                     data = JSON.parse(data.toString().trim()).data;
-                    printMessage(data.from, data.content);
+                    if(!data.from) {
+                        printMessage("server", data.content);
+                    } else {
+                        printMessage(data.from, data.content);
+                    }
                 } catch (error) {
                     throw error;  
                 }

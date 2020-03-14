@@ -1,3 +1,8 @@
+@font-face {
+  font-family: 'terminus';
+  src: url('TerminusTTF-4.47.0.ttf');
+}
+
 * {
     box-sizing:border-box;
   }
@@ -9,7 +14,7 @@
     width:100%;
     color:#dedede;
     background-color: #849091;
-    font-family: 'Helvetica Neue', Helvetica, sans-serif;
+    font-family: 'monospace';
   }
   
   header {
@@ -45,6 +50,7 @@
     padding:10px;
     font-size:22px;
     color:#eee;
+    font-family: 'monospace';
   }
   
   #messages {
@@ -53,6 +59,7 @@
     width:100%;
     margin:0 auto;
     overflow-y:auto;
+    font-size: 22px;
   }
   
   #messages p {
@@ -80,6 +87,11 @@
   .me, .username.me {
     font-weight:bold;
     color:cyan;
+  }
+
+  .server, .username.server {
+    font-weight:bold;
+    color:red;
   }
   
   .message-container .username.me {
